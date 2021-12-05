@@ -41,11 +41,12 @@ You will notice there is a (env) at the beginning of every line. This indicates 
 `$ pip install boto3` <br>
 `$ pip install Faker` <br>
 `$ pip install numpy` <br>
+`$ pip install json` <br>
 
 `$ pip freeze >> requirements.txt` <br>
 
 ### 2. Install VS Code Extensions
----
+
 For this solution we are going to use the "Remote - Containers" extension. This extension enables us to quickly create standardized Containers that we can code while it is running inside WSL2.
 
 Remote - Containers: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers <br>
@@ -53,10 +54,10 @@ Python: https://marketplace.visualstudio.com/items?itemName=ms-python.python <br
 Jupyter: https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter <br>
 
 ### 3. Create Python3 + Jupyter Container
----
+
 With the folder created, just run the command `$ code .` to open VS Code at that folder. When the folder is openned, press `Ctrl + Shift + p` and you can see the following option:
 
-[ ] Add images <br>
+[] Add images <br>
 (Add Development Container Configuration Files...) <br>
 (Show All Definitions...)<br>
 
@@ -75,7 +76,6 @@ devcontainer.json
 Now we are inside the application (Container) we have created. It is a specific Linux distribution **INSIDE** the WSL2. When we tell VS Code to Reopen/Rebuild the container it will do the same thing as `docker build` does and immediately access the container within a new VS Code instance.
 
 ## Working inside your Container
----
 After you successfully build your container, your Jupyter Server should be already running. If you look at the Ports tab in VS Code, there is one application running:
 ![image](https://user-images.githubusercontent.com/22838513/144737177-905477ba-4e34-4f6e-ac07-3cddb7996b12.png)
 
@@ -92,13 +92,19 @@ Since we are using VS Code, **you can create .ipynb files whithin your Container
 For now, our Container just contains the necessary files to build our technology stack. There are no python or jupyter notebook files.
 
 ## Create Firehose data stream
----
 We can achieve this through AWS Console Panel or through boto3 Python library. Using AWS console is easier when we are handling a small project:
 
+![image](https://user-images.githubusercontent.com/22838513/144743389-a9cc6c53-5125-459d-aa45-3e4e84b2cccf.png)
 
+![image](https://user-images.githubusercontent.com/22838513/144743407-4c344266-7bb4-45ca-a234-c5f3e88dc763.png)
+
+Select the destiny bucket:
+![image](https://user-images.githubusercontent.com/22838513/144743415-90e92f5a-622a-45f3-9ce4-d80edd51c1fd.png)
+
+Set buffer interval so we don't have to wait too long to see data inside S3:
+![image](https://user-images.githubusercontent.com/22838513/144743437-cd7946cc-e151-4ea9-b056-b1300e31915e.png)
 
 ## Create Credential files inside your project
----
 Inside the .devcontainer folder, create a folder called .aws. Then inside this folder we should create two files without any extension:
 
 config
@@ -119,6 +125,50 @@ aws_access_key_id = XXXXXXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXXX
 ```
 The packages boto3 will use these information interact with AWS' services.
+
+![image](https://user-images.githubusercontent.com/22838513/144743724-c9195313-ecef-4d1b-87ae-f1c1324ab47a.png)
+
+![image](https://user-images.githubusercontent.com/22838513/144743732-5c5d09bb-e927-4d16-9015-01226c07be7d.png)
+
+![image](https://user-images.githubusercontent.com/22838513/144743748-7fae35be-2631-4b4d-bd6a-8c7494d97e0a.png)
+
+To discover schema, we have to start sending records.
+
+```$ python3 send_captains_to_cloud.py```
+
+```sql
+CREATE OR REPLACE STREAM "CAPTAIN_SCORES" ("favoritecaptain" VARCHAR(32), average_rating DOUBLE, total_rating INTEGER);
+   
+CREATE OR REPLACE PUMP "STREAM_PUMP" AS
+INSERT INTO "CAPTAIN_SCORES"
+SELECT STREAM "favoritecaptain", avg("rating") as average_rating, sum("rating") as total_rating
+FROM "SOURCE_SQL_STREAM_001"
+GROUP BY "favoritecaptain", STEP("SOURCE_SQL_STREAM_001".ROWTIME BY INTERVAL '1' MINUTE)
+ORDER BY STEP("SOURCE_SQL_STREAM_001".ROWTIME BY INTERVAL '1' MINUTE), avg("rating") DESC;
+```
+
+```sql
+CREATE OR REPLACE STREAM "RAW_ANOMALY_STREAM" (
+   "favoritecaptain" VARCHAR(32),
+   "rating"          INTEGER,
+   "ANOMALY_SCORE"   DOUBLE);
+   
+CREATE OR REPLACE PUMP "RAW_PUMP" AS INSERT INTO "RAW_ANOMALY_STREAM"
+SELECT STREAM "favoritecaptain", "rating", "ANOMALY_SCORE" FROM
+TABLE(RANDOM_CUT_FOREST(
+  CURSOR(SELECT STREAM "favoritecaptain", "rating" FROM "SOURCE_SQL_STREAM_001")
+));
+   
+CREATE OR REPLACE STREAM "ORDERED_ANOMALY_STREAM" (
+   "favoritecaptain" VARCHAR(32),
+   "rating"          INTEGER,
+   "ANOMALY_SCORE"   DOUBLE);
+   
+-- Sort records by descending anomaly score, insert into output stream
+CREATE OR REPLACE PUMP "ORDERED_PUMP" AS INSERT INTO "ORDERED_ANOMALY_STREAM"
+SELECT STREAM * FROM "RAW_ANOMALY_STREAM"
+ORDER BY FLOOR("RAW_ANOMALY_STREAM".ROWTIME TO SECOND), "ANOMALY_SCORE" DESC;
+```
 
 # References
 https://www.youtube.com/watch?v=rYbS5ihk_xg<br>
