@@ -19,7 +19,25 @@ I like that setup because I can easily use my current OS instead of using termin
 
 # Setting up your first data stream
 
+## Creating your Container
 
+## Running your Container
+After you successfully build your container, your Jupyter Server should be already running. If you look at the Ports tab in VS Code, there is one application running:
+![image](https://user-images.githubusercontent.com/22838513/144737177-905477ba-4e34-4f6e-ac07-3cddb7996b12.png)
+
+However, if you access it directly through your web browser you will see a authentication screen. What you should do is run the following command **inside your container** to list all Jupyter servers running in your machine:<br>
+
+``` jupyter notebook list ```
+
+With the following output we are able to access Jupyter directly through browser if you click the link:
+![image](https://user-images.githubusercontent.com/22838513/144737167-065a163e-1d74-4d73-8819-b2a139dd12fc.png)
+
+Since we are using VS Code, **you can create .ipynb files whithin your Container and any changes made will be translated to the files located in WSL2** (Or to whatever folder you have run your build command).
+
+For now, our Container just contains the necessary files to build our technology stack. There are no python or jupyter notebook files.
+
+## Create Firehose data stream
+We can achieve this through
 
 ```
 |Project root folder
