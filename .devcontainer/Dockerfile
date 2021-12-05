@@ -14,7 +14,7 @@ RUN apt-get update \
  && bash /tmp/library-scripts/common-debian.sh \
  && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts
  
- COPY .aws /home/jovyan/.aws
+COPY .aws /home/jovyan/.aws
 
 #[Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 COPY requirements.txt /tmp/pip-tmp/
