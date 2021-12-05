@@ -14,6 +14,8 @@ I like that setup because I can easily use my current OS instead of using termin
 
 ## AWS Stack
 
+![image](https://user-images.githubusercontent.com/22838513/144736978-57f4a665-8f2d-4ff1-ba6c-eb3499e2eec5.png)
+
 
 # Setting up your first data stream
 
