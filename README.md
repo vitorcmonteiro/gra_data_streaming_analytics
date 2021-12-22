@@ -78,6 +78,7 @@ You will notice there is a (env) at the beginning of every line. This indicates 
 `$ pip install boto3` <br>
 `$ pip install Faker` <br>
 `$ pip install numpy` <br>
+`$ pip install json` <br>
 
 * boto3 [^8] is used to use a broad range of AWS services through your Python code.
 * Faker [^9] will enable us to generate fake data to be consumed by AWS Kinesis using Python code.
@@ -86,15 +87,31 @@ You will notice there is a (env) at the beginning of every line. This indicates 
 
 `$ pip freeze >> requirements.txt` <br>
 
+<<<<<<< HEAD
 Inside your project folder there will be a file called *requirements.txt* which will hold all your Python Packages and their dependencies. This file will be used by Docker during the container build to reproduce the same environment you have in your project.
+=======
+### 2. Install VS Code Extensions
+
+For this solution we are going to use the "Remote - Containers" extension. This extension enables us to quickly create standardized Containers that we can code while it is running inside WSL2.
+>>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 Although some versions may change as the versions evolve, your requirements.txt file should have boto3, Faker, and numpy listed somehwere:
 
+<<<<<<< HEAD
 (Insert requirements.txt image)
 <br><br>
 
 ### **Install VS Code Extensions**
 Second, we are going to use the "Remote - Containers" extension for VS Code. This extension enables us to quickly create Containers that we can code while it is running inside WSL2. Additionally, we will install a few extra extensions like Python and Jupyter to allow for Notebook programming.
+=======
+### 3. Create Python3 + Jupyter Container
+
+With the folder created, just run the command `$ code .` to open VS Code at that folder. When the folder is openned, press `Ctrl + Shift + p` and you can see the following option:
+
+[] Add images <br>
+(Add Development Container Configuration Files...) <br>
+(Show All Definitions...)<br>
+>>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 You can search these extensions inside VS Code our using the following links:
 
@@ -128,10 +145,16 @@ After the files are created, VS Code will prompt you to build/reopen the contain
 
 Now we are inside the application (Container) we have created. It is a specific Linux distribution **INSIDE** the WSL2. When we tell VS Code to Reopen/Rebuild the container it will do the same thing as `docker build` does and immediately access the container within a new VS Code instance.
 
+<<<<<<< HEAD
 Observe that before running build command your VS Code indicated WSL as the current folder we are working in. After running, it changes to " Dev Container:
 
 (Before) >> (After)
 <br><br>
+=======
+## Working inside your Container
+After you successfully build your container, your Jupyter Server should be already running. If you look at the Ports tab in VS Code, there is one application running:
+![image](https://user-images.githubusercontent.com/22838513/144737177-905477ba-4e34-4f6e-ac07-3cddb7996b12.png)
+>>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 ### **Working inside your Container**
 After you successfully built your container, your Jupyter Server should be already running in the background. If you look at the Ports tab in VS Code, there is one application running:
@@ -146,6 +169,7 @@ With the following output we are able to access Jupyter directly through browser
 
 ![Jupyter server link](https://user-images.githubusercontent.com/22838513/144737167-065a163e-1d74-4d73-8819-b2a139dd12fc.png)
 
+<<<<<<< HEAD
 Since we are using VS Code, **you can create .ipynb files whithin your Container and any changes made will be translated to the files located in WSL2**.
 
 For now, our Container just contains the necessary files to build our technology stack. There are no Python or Jupyter notebook files.
@@ -251,6 +275,23 @@ We will cover:
 AWS access a specific folder when we try to access services through boto3 (or through console operations). We will now create that folder and configure the files in order to enable programatic access.
 
 Inside the `.devcontainer` folder, create a folder called `.aws`. Then inside this folder we should create two files:
+=======
+## Create Firehose data stream
+We can achieve this through AWS Console Panel or through boto3 Python library. Using AWS console is easier when we are handling a small project:
+
+![image](https://user-images.githubusercontent.com/22838513/144743389-a9cc6c53-5125-459d-aa45-3e4e84b2cccf.png)
+
+![image](https://user-images.githubusercontent.com/22838513/144743407-4c344266-7bb4-45ca-a234-c5f3e88dc763.png)
+
+Select the destiny bucket:
+![image](https://user-images.githubusercontent.com/22838513/144743415-90e92f5a-622a-45f3-9ce4-d80edd51c1fd.png)
+
+Set buffer interval so we don't have to wait too long to see data inside S3:
+![image](https://user-images.githubusercontent.com/22838513/144743437-cd7946cc-e151-4ea9-b056-b1300e31915e.png)
+
+## Create Credential files inside your project
+Inside the .devcontainer folder, create a folder called .aws. Then inside this folder we should create two files without any extension:
+>>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 config
 : Default region and output type when interacting with AWS.
@@ -352,7 +393,52 @@ Open the Jupyter server in your browser and create a new notebook. We will test 
 
 <br><br>
 
+![image](https://user-images.githubusercontent.com/22838513/144743724-c9195313-ecef-4d1b-87ae-f1c1324ab47a.png)
+
+![image](https://user-images.githubusercontent.com/22838513/144743732-5c5d09bb-e927-4d16-9015-01226c07be7d.png)
+
+![image](https://user-images.githubusercontent.com/22838513/144743748-7fae35be-2631-4b4d-bd6a-8c7494d97e0a.png)
+
+To discover schema, we have to start sending records.
+
+```$ python3 send_captains_to_cloud.py```
+
+```sql
+CREATE OR REPLACE STREAM "CAPTAIN_SCORES" ("favoritecaptain" VARCHAR(32), average_rating DOUBLE, total_rating INTEGER);
+   
+CREATE OR REPLACE PUMP "STREAM_PUMP" AS
+INSERT INTO "CAPTAIN_SCORES"
+SELECT STREAM "favoritecaptain", avg("rating") as average_rating, sum("rating") as total_rating
+FROM "SOURCE_SQL_STREAM_001"
+GROUP BY "favoritecaptain", STEP("SOURCE_SQL_STREAM_001".ROWTIME BY INTERVAL '1' MINUTE)
+ORDER BY STEP("SOURCE_SQL_STREAM_001".ROWTIME BY INTERVAL '1' MINUTE), avg("rating") DESC;
+```
+
+```sql
+CREATE OR REPLACE STREAM "RAW_ANOMALY_STREAM" (
+   "favoritecaptain" VARCHAR(32),
+   "rating"          INTEGER,
+   "ANOMALY_SCORE"   DOUBLE);
+   
+CREATE OR REPLACE PUMP "RAW_PUMP" AS INSERT INTO "RAW_ANOMALY_STREAM"
+SELECT STREAM "favoritecaptain", "rating", "ANOMALY_SCORE" FROM
+TABLE(RANDOM_CUT_FOREST(
+  CURSOR(SELECT STREAM "favoritecaptain", "rating" FROM "SOURCE_SQL_STREAM_001")
+));
+   
+CREATE OR REPLACE STREAM "ORDERED_ANOMALY_STREAM" (
+   "favoritecaptain" VARCHAR(32),
+   "rating"          INTEGER,
+   "ANOMALY_SCORE"   DOUBLE);
+   
+-- Sort records by descending anomaly score, insert into output stream
+CREATE OR REPLACE PUMP "ORDERED_PUMP" AS INSERT INTO "ORDERED_ANOMALY_STREAM"
+SELECT STREAM * FROM "RAW_ANOMALY_STREAM"
+ORDER BY FLOOR("RAW_ANOMALY_STREAM".ROWTIME TO SECOND), "ANOMALY_SCORE" DESC;
+```
+
 # References
+<<<<<<< HEAD
 [^1]: [VS Code Remote Containers Documentation](https://code.visualstudio.com/docs/remote/containers) <br>
 [^2]: [AWS Kinesis Tutorial for Beginners](https://www.youtube.com/watch?v=rYbS5ihk_xg) <br>
 [^3]: [AWS Documentation on Kinesis](https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-kinesis) <br>
@@ -363,3 +449,11 @@ Open the Jupyter server in your browser and create a new notebook. We will test 
 [^8]: [boto3 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) <br>
 [^9]: [Faker Documentation](https://faker.readthedocs.io/en/master/) <br>
 [^10]: [NumPy Documentation](https://numpy.org/doc/) <br>
+=======
+https://www.youtube.com/watch?v=rYbS5ihk_xg<br>
+https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-kinesis<br>
+https://aws.amazon.com/kinesis/getting-started/?nc=sn&loc=3<br>
+https://faun.pub/apache-kafka-vs-apache-kinesis-57a3d585ef78<br>
+https://ruslanmv.com/blog/Real-Time-Data-Analysis-with-Kinesis-in-EC2<br>
+https://www.ioconnectservices.com/insight/using-lambda-and-the-new-firehose-console-to-transform-data<br>
+>>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
