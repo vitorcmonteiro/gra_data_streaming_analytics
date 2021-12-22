@@ -5,7 +5,7 @@ import random
 import time
 import json
 
-DeliveryStreamName = 'PUT-S3-zUZXi'
+DeliveryStreamName = 'PUT-S3-qrZbv'
 client = boto3.client('firehose')
 fake = Faker()
 
