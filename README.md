@@ -21,7 +21,8 @@ To achieve that, we will use VS Code with a plugin that allows us to develop a c
 
 It is very similar to the following tech stack but with less components because we are building a small solution to test Firehose.
 
-(Insert image from AWS Stack)
+![AWS Stack](https://user-images.githubusercontent.com/22838513/147084989-62058c7d-51b7-42b9-b67e-912652482bbd.png)
+
 
 # Setting up your first data stream
 
@@ -33,21 +34,21 @@ This tutorial comprises the following key steps:<br>
 4. [Code Project & Test](#code-project-&-test)
 
 ## Installing Docker inside WSL2
----
 You should install Docker Engine to run your project inside WSL2. I've followed the steps from Docker website ("Install using the repository" - Ubuntu). [^6]
 
-After installing Docker Engine, give it a try:<br>
-`$ sudo dockerd`
+After installing Docker Engine, give it a try: <br>
+```
+$ sudo dockerd
+```
 
-(Insert dockerd initialization)
+![dockerd initialized](https://user-images.githubusercontent.com/22838513/147085558-15778d8c-4f9e-4acc-af18-6552ebd9d52c.png)
 
 In another terminal, type `$ docker` and you should see docker options:
 
-(Insert docker help)
+![Docker helper](https://user-images.githubusercontent.com/22838513/147085427-97fd67b4-7fa3-4275-80d6-112c1b9ffe0e.png)
 <br><br>
 
 ## Setup Development Environment
----
 We are going through the following key steps:
 1. Create folder and start project (virtual environment)
 2. Install VS Code Extensions
@@ -56,22 +57,32 @@ We are going through the following key steps:
 <br><br>
 
 ### **Create folder and start project (virtual environment)**
-First, we create the folder inside WSL2 to hold our project files:<br>
-`$ mkdir app`
+First, we create the folder inside WSL2 to hold our project files: <br>
+```
+$ mkdir app
+```
+<br>
 
-(Insert image from folder creation)
+![mkdir](https://user-images.githubusercontent.com/22838513/147085224-e8f240e6-c503-4814-8435-4a67da250b35.png)
 
-Now, inside the newly created folder, let's sdtart a Python's virtual environment so we have a blank slate to work with:
+Now, inside the newly created folder, let's start a Python virtual environment so we have a blank slate to work with:
 
-`$ python3 -m venv env` <br>
+```
+$ python3 -m venv env
+```
+<br>
 
-(Insert image from venv creation)
+![venv](https://user-images.githubusercontent.com/22838513/147085319-e744a1ef-2838-4729-87c9-f2c3f46fcf35.png)
 
 This virtual environment will create a new Python environment linked to your original Python installation. This will ensure that we have a clean slate to install packages for each projects and keep the original Python installation. [^7]
 
-`$ source env/bin/activate` <br>
+```
+$ source env/bin/activate
+```
+<br>
 
-(Insert image from venv activation)
+![env activated](https://user-images.githubusercontent.com/22838513/147085989-7dc10d60-6f08-4e96-98c3-67d400e6e73a.png)
+
 
 You will notice there is a (env) at the beginning of every line. This indicates that we are using the virtual environment. Now we will install the packages we need:
 
@@ -84,36 +95,26 @@ You will notice there is a (env) at the beginning of every line. This indicates 
 * Faker [^9] will enable us to generate fake data to be consumed by AWS Kinesis using Python code.
 * Numpy [^10] 
 
+```
+$ pip freeze >> requirements.txt
+```
+<br>
 
-`$ pip freeze >> requirements.txt` <br>
-
-<<<<<<< HEAD
 Inside your project folder there will be a file called *requirements.txt* which will hold all your Python Packages and their dependencies. This file will be used by Docker during the container build to reproduce the same environment you have in your project.
-=======
+
 ### 2. Install VS Code Extensions
 
 For this solution we are going to use the "Remote - Containers" extension. This extension enables us to quickly create standardized Containers that we can code while it is running inside WSL2.
->>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 Although some versions may change as the versions evolve, your requirements.txt file should have boto3, Faker, and numpy listed somehwere:
 
-<<<<<<< HEAD
-(Insert requirements.txt image)
+![requirements.txt](https://user-images.githubusercontent.com/22838513/147086118-dcb031c1-f9ca-4e64-ae0f-f193de7f4849.png)
 <br><br>
 
 ### **Install VS Code Extensions**
 Second, we are going to use the "Remote - Containers" extension for VS Code. This extension enables us to quickly create Containers that we can code while it is running inside WSL2. Additionally, we will install a few extra extensions like Python and Jupyter to allow for Notebook programming.
-=======
-### 3. Create Python3 + Jupyter Container
 
-With the folder created, just run the command `$ code .` to open VS Code at that folder. When the folder is openned, press `Ctrl + Shift + p` and you can see the following option:
-
-[] Add images <br>
-(Add Development Container Configuration Files...) <br>
-(Show All Definitions...)<br>
->>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
-
-You can search these extensions inside VS Code our using the following links:
+You can search these extensions inside VS Code or using the following links:
 
 * [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 * [Python Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
@@ -121,16 +122,15 @@ You can search these extensions inside VS Code our using the following links:
 <br><br>
 
 ### **Create your Container**
+With the extensions installed make sure you are inside your project's main folder `~/repos/app` in my case and run the command `$ code .` to open VS Code at current folder. When the folder is openned, press `Ctrl + Shift + P` and you will see the following option:
 
-Now make sure you are inside your project's main folder `~/repos/app` in my case and run the command `$ code .` to open VS Code at current folder. When the folder is openned, press `Ctrl + Shift + P` and you will see the following option:
-
-(Add Development Container Configuration Files...)
+![Add development container](https://user-images.githubusercontent.com/22838513/147086868-118cfa19-774a-4de3-83a4-28948423c142.png)
 
 That menu will give you the most used standardized containers, but we will use one called **"Jupyter Data Science Notebooks"** that should appear under the **"Show All Definitions..."** option.
 
-As soon as you click it, new files will be created inside the folder called `.devcontainer`. <br>
+As soon as you click it, new files will be created inside the folder called `.devcontainer`.
 
-(Devcontainer image)
+![devcontainer folder](https://user-images.githubusercontent.com/22838513/147086958-b4e0dee7-a2cb-4e24-9459-a27db148f47a.png)
 
 Dockerfile
 : Steps Docker will take when you ask it to build the container (app). <br>
@@ -141,20 +141,14 @@ We won't get into details for each file, but it is important to make a quick edi
 
 After the files are created, VS Code will prompt you to build/reopen the container as a remote container because it noticed that you have a `.devcontainer` folder within your project. If that doesn't happen, you may use the following option (`Ctrl + Shift + P`) to manually run the build function:
 
-(Reopen in Container)
+![Reopen container](https://user-images.githubusercontent.com/22838513/147087082-d1182203-3b03-47a8-9ff1-9b7520a32a19.png)
 
 Now we are inside the application (Container) we have created. It is a specific Linux distribution **INSIDE** the WSL2. When we tell VS Code to Reopen/Rebuild the container it will do the same thing as `docker build` does and immediately access the container within a new VS Code instance.
 
-<<<<<<< HEAD
 Observe that before running build command your VS Code indicated WSL as the current folder we are working in. After running, it changes to " Dev Container:
 
-(Before) >> (After)
+![before](https://user-images.githubusercontent.com/22838513/147087170-e9df634b-7cb6-4d01-8525-ef10756af72b.png) >> ![after](https://user-images.githubusercontent.com/22838513/147087179-f52af9fb-ca6c-43d0-a93e-05c74ecfd39e.png)
 <br><br>
-=======
-## Working inside your Container
-After you successfully build your container, your Jupyter Server should be already running. If you look at the Ports tab in VS Code, there is one application running:
-![image](https://user-images.githubusercontent.com/22838513/144737177-905477ba-4e34-4f6e-ac07-3cddb7996b12.png)
->>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 ### **Working inside your Container**
 After you successfully built your container, your Jupyter Server should be already running in the background. If you look at the Ports tab in VS Code, there is one application running:
@@ -163,16 +157,15 @@ After you successfully built your container, your Jupyter Server should be alrea
 
 However, if you access it directly through your web browser you will see an authentication screen. What you should do is run the following command **inside your container** (using VS Code Terminal) to list all Jupyter servers running in your machine: <br>
 
-`$ jupyter notebook list`
+```
+$ jupyter notebook list
+```
 
-With the following output we are able to access Jupyter directly through browser if you `ctrl+left click` the link:
+With the following output we are able to access Jupyter directly through browser if you `CTRL+Left Click` the link:
 
 ![Jupyter server link](https://user-images.githubusercontent.com/22838513/144737167-065a163e-1d74-4d73-8819-b2a139dd12fc.png)
 
-<<<<<<< HEAD
-Since we are using VS Code, **you can create .ipynb files whithin your Container and any changes made will be translated to the files located in WSL2**.
-
-For now, our Container just contains the necessary files to build our technology stack. There are no Python or Jupyter notebook files.
+Since we are using VS Code, **you can create .ipynb files whithin your Container and any changes made will be translated to the files located in WSL2**. For now, our Container just contains the necessary files to build our technology stack. There are no Python or Jupyter notebook files.
 
 Now your project has been created successfully! :smiley:
 <br><br>
@@ -209,11 +202,11 @@ Click `Create delivery stream` to get started. Below you find suggested minimum 
 * Capacity mode = Provisioned
     * Provisioned shards = 1
 
-(Insert config image)
+![Create data stream config](https://user-images.githubusercontent.com/22838513/147087376-b62b7566-5b3d-4347-b0e6-3b82b5639704.png)
 
 With the data stream up, you should see that we divide into two categories: Data Producers and Data Consumers.
 
-(Insert consumers producers image)
+![Data Producers and Consumers](https://user-images.githubusercontent.com/22838513/147087431-b59af1df-928b-42a0-bac0-4ac3892806e0.png)
 
 Data Producers
 : Create records for the Kinesis Data Stream. May be your local machine, app, or EC2. This time, it will be our local machine.
@@ -242,9 +235,11 @@ Done. Create your new delivery stream. You have setup all required AWS services.
 ### **Create a Credential**
 Before we move our focus out of AWS, in order to access AWS functionalities we just created from your Python code, you need to setup a credential using the IAM function of AWS. Just search for `IAM`.
 
+![iam](https://user-images.githubusercontent.com/22838513/147087668-d5d15c4e-44c1-4518-9691-70ef23dba7b1.png)
+
 On the left panel, navigate to Access Management >> Users >> Add users.
 
-(Insert user screen)
+![user](https://user-images.githubusercontent.com/22838513/147087687-f9d8d0be-51c8-4242-ad58-aef688f12bc4.png)
 
 You can name it however you want but make sure that `Access key - Programmatic access` is ticked. I chose `firehose_user` as the username.
 
@@ -255,13 +250,12 @@ Now we move to the permissions section. Choose `Attach existing policies directl
 
 After choosing these two policies you may proceed until you reach out the review screen. Create user if you see these two policies. **DO NOT CLOSE THE FOLLOWING WINDOW.**
 
-(Insert firehose user)
+![firehose_user](https://user-images.githubusercontent.com/22838513/147087771-2ac6df5b-5995-401b-9629-4a81bd30c283.png)
 
 Save `Access key ID` and `Secret access key` in a safe place because we will use them during next step. If you lost it or clicked next without saving the keys, you have to browse the user you want to recover the key and you are able to issue a new key at the Security credentials tab.
 <br><br>
 
 ## Code Project & Test
----
 This is the last section. Now we focus on the development of the Data Producer and Analyzing incoming data being saved in S3.
 
 We will cover:
@@ -271,27 +265,8 @@ We will cover:
 3. Analyze generated data
 <br><br>
 
-### **Create Credential folder and files**
-AWS access a specific folder when we try to access services through boto3 (or through console operations). We will now create that folder and configure the files in order to enable programatic access.
-
-Inside the `.devcontainer` folder, create a folder called `.aws`. Then inside this folder we should create two files:
-=======
-## Create Firehose data stream
-We can achieve this through AWS Console Panel or through boto3 Python library. Using AWS console is easier when we are handling a small project:
-
-![image](https://user-images.githubusercontent.com/22838513/144743389-a9cc6c53-5125-459d-aa45-3e4e84b2cccf.png)
-
-![image](https://user-images.githubusercontent.com/22838513/144743407-4c344266-7bb4-45ca-a234-c5f3e88dc763.png)
-
-Select the destiny bucket:
-![image](https://user-images.githubusercontent.com/22838513/144743415-90e92f5a-622a-45f3-9ce4-d80edd51c1fd.png)
-
-Set buffer interval so we don't have to wait too long to see data inside S3:
-![image](https://user-images.githubusercontent.com/22838513/144743437-cd7946cc-e151-4ea9-b056-b1300e31915e.png)
-
 ## Create Credential files inside your project
 Inside the .devcontainer folder, create a folder called .aws. Then inside this folder we should create two files without any extension:
->>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
 
 config
 : Default region and output type when interacting with AWS.
@@ -393,52 +368,7 @@ Open the Jupyter server in your browser and create a new notebook. We will test 
 
 <br><br>
 
-![image](https://user-images.githubusercontent.com/22838513/144743724-c9195313-ecef-4d1b-87ae-f1c1324ab47a.png)
-
-![image](https://user-images.githubusercontent.com/22838513/144743732-5c5d09bb-e927-4d16-9015-01226c07be7d.png)
-
-![image](https://user-images.githubusercontent.com/22838513/144743748-7fae35be-2631-4b4d-bd6a-8c7494d97e0a.png)
-
-To discover schema, we have to start sending records.
-
-```$ python3 send_captains_to_cloud.py```
-
-```sql
-CREATE OR REPLACE STREAM "CAPTAIN_SCORES" ("favoritecaptain" VARCHAR(32), average_rating DOUBLE, total_rating INTEGER);
-   
-CREATE OR REPLACE PUMP "STREAM_PUMP" AS
-INSERT INTO "CAPTAIN_SCORES"
-SELECT STREAM "favoritecaptain", avg("rating") as average_rating, sum("rating") as total_rating
-FROM "SOURCE_SQL_STREAM_001"
-GROUP BY "favoritecaptain", STEP("SOURCE_SQL_STREAM_001".ROWTIME BY INTERVAL '1' MINUTE)
-ORDER BY STEP("SOURCE_SQL_STREAM_001".ROWTIME BY INTERVAL '1' MINUTE), avg("rating") DESC;
-```
-
-```sql
-CREATE OR REPLACE STREAM "RAW_ANOMALY_STREAM" (
-   "favoritecaptain" VARCHAR(32),
-   "rating"          INTEGER,
-   "ANOMALY_SCORE"   DOUBLE);
-   
-CREATE OR REPLACE PUMP "RAW_PUMP" AS INSERT INTO "RAW_ANOMALY_STREAM"
-SELECT STREAM "favoritecaptain", "rating", "ANOMALY_SCORE" FROM
-TABLE(RANDOM_CUT_FOREST(
-  CURSOR(SELECT STREAM "favoritecaptain", "rating" FROM "SOURCE_SQL_STREAM_001")
-));
-   
-CREATE OR REPLACE STREAM "ORDERED_ANOMALY_STREAM" (
-   "favoritecaptain" VARCHAR(32),
-   "rating"          INTEGER,
-   "ANOMALY_SCORE"   DOUBLE);
-   
--- Sort records by descending anomaly score, insert into output stream
-CREATE OR REPLACE PUMP "ORDERED_PUMP" AS INSERT INTO "ORDERED_ANOMALY_STREAM"
-SELECT STREAM * FROM "RAW_ANOMALY_STREAM"
-ORDER BY FLOOR("RAW_ANOMALY_STREAM".ROWTIME TO SECOND), "ANOMALY_SCORE" DESC;
-```
-
 # References
-<<<<<<< HEAD
 [^1]: [VS Code Remote Containers Documentation](https://code.visualstudio.com/docs/remote/containers) <br>
 [^2]: [AWS Kinesis Tutorial for Beginners](https://www.youtube.com/watch?v=rYbS5ihk_xg) <br>
 [^3]: [AWS Documentation on Kinesis](https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-kinesis) <br>
@@ -449,11 +379,3 @@ ORDER BY FLOOR("RAW_ANOMALY_STREAM".ROWTIME TO SECOND), "ANOMALY_SCORE" DESC;
 [^8]: [boto3 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) <br>
 [^9]: [Faker Documentation](https://faker.readthedocs.io/en/master/) <br>
 [^10]: [NumPy Documentation](https://numpy.org/doc/) <br>
-=======
-https://www.youtube.com/watch?v=rYbS5ihk_xg<br>
-https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-kinesis<br>
-https://aws.amazon.com/kinesis/getting-started/?nc=sn&loc=3<br>
-https://faun.pub/apache-kafka-vs-apache-kinesis-57a3d585ef78<br>
-https://ruslanmv.com/blog/Real-Time-Data-Analysis-with-Kinesis-in-EC2<br>
-https://www.ioconnectservices.com/insight/using-lambda-and-the-new-firehose-console-to-transform-data<br>
->>>>>>> 30041833be1089eb6a64a450340e86a8b77a6fd2
