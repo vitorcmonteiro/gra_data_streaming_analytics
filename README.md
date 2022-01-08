@@ -223,7 +223,7 @@ A few sections will be added to the screen. Choose the Data Stream in the follow
 
 Now inside `Transform and convert records` we will configure the output of the stream to a parquet file. We enable `Convert record format` and choose output format as `Apache Parquet`:
 
-(#Image)
+![transform](https://user-images.githubusercontent.com/22838513/148641313-562fc398-4661-42fb-933b-7ce12e454bbc.png)
 
 We will not get into details of AWS Glue, but it is Glue that takes the input and transforms it before sending to S3. To acoomplish that you will need to create a Database and Table inside clue and then associate that with this stream. <br>
 
